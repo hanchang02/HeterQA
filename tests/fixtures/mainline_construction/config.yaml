@@ -1,0 +1,33 @@
+mode: mainline
+
+data:
+  business_records_jsonl: tests/fixtures/mainline_construction/business_records.jsonl
+  text_evidence_jsonl: tests/fixtures/mainline_construction/text_evidence.jsonl
+
+settings:
+  enabled_geo: true
+  enabled_text: true
+  enabled_image: false
+  enabled_kg: false
+  enable_cross_modal: false
+  top_k: 10
+  evidence_limit: 3
+  support_threshold: 0.7
+  allow_missing_structured_values: false
+
+case:
+  qid: synthetic-mainline-1
+  subset: Geo_Text
+  structured_filters:
+    - field: categories
+      operator: "="
+      value: ["Cafe"]
+    - field: outdoor_seating
+      operator: "="
+      value: true
+  geo_constraint:
+    reference_latitude: 39.9526
+    reference_longitude: -75.1652
+    radius_km: 2
+  text_query: friendly service outdoor seating
+  final_query: Find cafes within 2 km that offer outdoor seating and friendly service.

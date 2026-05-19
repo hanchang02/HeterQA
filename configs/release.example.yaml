@@ -1,0 +1,5 @@
+input_dir: path/to/final_dataset
+output_dir: path/to/heterqa_hf_release
+validate: true
+raw_yelp_content_released: false
+requires_external_yelp_access: true

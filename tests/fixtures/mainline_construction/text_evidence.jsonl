@@ -1,0 +1,4 @@
+{"business_id":"synthetic_cafe_1","source_locator_type":"review_id","source_locator":"synthetic_review_1","summary":"Customers mention friendly service and a pleasant outdoor seating area.","score":0.95,"supports":true}
+{"business_id":"synthetic_cafe_2","source_locator_type":"review_id","source_locator":"synthetic_review_2","summary":"Friendly service, but this business is far from the reference point.","score":0.90,"supports":true}
+{"business_id":"synthetic_bar_1","source_locator_type":"review_id","source_locator":"synthetic_review_3","summary":"Friendly staff at a bar.","score":0.80,"supports":true}
+

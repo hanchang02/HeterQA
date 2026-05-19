@@ -1,0 +1,25 @@
+# Contradiction-detection configuration template.
+
+# Optional. Use either a factory returning an AIModel-like object or individual
+# importable components. Keep endpoints and keys outside the repository.
+# model:
+#   factory: local_package.model_factory:create_model
+#   kwargs:
+#     config_path: path/to/local_model_config.yaml
+# model:
+#   semantic_judge:
+#     class: heterqa.providers.model_client.OpenAICompatibleJsonJudge
+#     kwargs:
+#       model: ${HETERQA_TEXT_MODEL}
+#       base_url: ${HETERQA_OPENAI_BASE_URL:-https://api.openai.com/v1}
+#       api_key_env: HETERQA_OPENAI_API_KEY
+#   visual_judge:
+#     class: heterqa.providers.model_client.OpenAICompatibleJsonJudge
+#     kwargs:
+#       model: ${HETERQA_VISION_MODEL}
+#       base_url: ${HETERQA_OPENAI_BASE_URL:-https://api.openai.com/v1}
+#       api_key_env: HETERQA_OPENAI_API_KEY
+
+thresholds:
+  support_confidence: 0.7
+  semantic_consistency_confidence: 0.7

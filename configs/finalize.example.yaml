@@ -1,0 +1,6 @@
+# Answer-set certification template.
+answer_count_min: 1
+answer_count_max: 10
+
+# Optional target size for a fixed dataset instance.
+expected_case_count:

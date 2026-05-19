@@ -1,0 +1,11 @@
+{
+  "type": "object",
+  "required": ["qid", "answer_business_ids", "answer_business_names", "answer_count"],
+  "properties": {
+    "qid": {"type": "string"},
+    "answer_business_ids": {"type": "array", "items": {"type": "string"}},
+    "answer_business_names": {"type": "array", "items": {"type": "string"}},
+    "answer_count": {"type": "integer"},
+    "source_case_category": {"type": ["string", "null"]}
+  }
+}

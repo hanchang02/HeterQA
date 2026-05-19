@@ -1,0 +1,4 @@
+# Manual-review workflow template.
+packet_format: csv
+allowed_decisions: ["yes", "no", "unclear"]
+

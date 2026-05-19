@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "required": ["qid", "query", "subset", "answer_count"],
+  "properties": {
+    "qid": {"type": "string"},
+    "query": {"type": "string"},
+    "subset": {"type": "string"},
+    "answer_count": {"type": "integer"}
+  }
+}

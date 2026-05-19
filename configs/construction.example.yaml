@@ -1,0 +1,139 @@
+# Construction-stage configuration template.
+mode: mainline
+
+# Optional model integration. A top-level factory can return an object exposing
+# the public component attributes below, or each component can be configured
+# separately with a public Python import path.
+# model:
+#   factory: local_package.model_factory:create_model
+#   kwargs:
+#     config_path: path/to/local_model_config.yaml
+# model:
+#   semantic_judge:
+#     class: heterqa.providers.model_client.OpenAICompatibleJsonJudge
+#     kwargs:
+#       model: ${HETERQA_TEXT_MODEL}
+#       base_url: ${HETERQA_OPENAI_BASE_URL:-https://api.openai.com/v1}
+#       api_key_env: HETERQA_OPENAI_API_KEY
+#   visual_judge:
+#     class: heterqa.providers.model_client.OpenAICompatibleJsonJudge
+#     kwargs:
+#       model: ${HETERQA_VISION_MODEL}
+#       base_url: ${HETERQA_OPENAI_BASE_URL:-https://api.openai.com/v1}
+#       api_key_env: HETERQA_OPENAI_API_KEY
+#   embedding:
+#     class: heterqa.providers.model_client.OpenAICompatibleEmbedding
+#     kwargs:
+#       model: ${HETERQA_TEXT_EMBEDDING_MODEL}
+#       base_url: ${HETERQA_OPENAI_BASE_URL:-https://api.openai.com/v1}
+#       api_key_env: HETERQA_OPENAI_API_KEY
+#   visual_embedding:
+#     class: heterqa.providers.model_client.OpenAICompatibleEmbedding
+#     kwargs:
+#       model: ${HETERQA_VISUAL_TEXT_EMBEDDING_MODEL}
+#       base_url: ${HETERQA_OPENAI_BASE_URL:-https://api.openai.com/v1}
+#       api_key_env: HETERQA_OPENAI_API_KEY
+#   reranker:
+#     class: heterqa.providers.model_client.ScoreReranker
+#     kwargs: {}
+#   visual_reranker:
+#     class: heterqa.providers.model_client.ScoreReranker
+#     kwargs: {}
+
+data:
+  provider: file
+  business_records_jsonl: path/to/business_records.jsonl
+  text_evidence_jsonl: path/to/review_evidence.jsonl
+  image_evidence_jsonl: path/to/photo_evidence.jsonl
+  kg_evidence_jsonl: path/to/kg_evidence.jsonl
+  graph_features_jsonl: path/to/graph_features.jsonl
+  review_embedding_jsonl: path/to/review_embedding_index.jsonl
+  photo_embedding_jsonl: path/to/photo_embedding_index.jsonl
+  feature_embedding_jsonl: path/to/feature_embedding_index.jsonl
+  cross_modal_evidence_jsonl: path/to/cross_modal_evidence.jsonl
+
+# Alternative for full local reconstruction from files obtained separately
+# from the Yelp Open Dataset.  The code does not redistribute these files.
+# data:
+#   provider: yelp_open_dataset
+#   # Either point at the official extracted Yelp layout:
+#   yelp_root: data/yelp/extracted
+#   # Or provide each source file explicitly:
+#   business_jsonl: path/to/yelp_academic_dataset_business.json
+#   review_jsonl: path/to/yelp_academic_dataset_review.json
+#   photos_json: path/to/photos.json
+#   photo_dir: path/to/Yelp_Photos/photos
+#   kg_evidence_jsonl: path/to/kg_evidence.jsonl
+#   graph_features_jsonl: path/to/graph_features.jsonl
+#   review_embedding_jsonl: path/to/review_embedding_index.jsonl
+#   photo_embedding_jsonl: path/to/photo_embedding_index.jsonl
+#   feature_embedding_jsonl: path/to/feature_embedding_index.jsonl
+#   max_reviews_per_business: 50
+
+# Alternative for a SQL/OceanBase deployment. Keep credentials in a local
+# config or environment-expanded wrapper; do not commit real values.
+# data:
+#   provider: oceanbase
+#   host: ${HETERQA_DB_HOST}
+#   port: 2881
+#   user: ${HETERQA_DB_USER}
+#   password: ${HETERQA_DB_PASSWORD}
+#   database: yelpdb
+#   business_table: business
+#   review_table: review
+#   photo_table: photo
+#   business_id_column: business_id
+#   # Optional SQL templates support deployment-specific vector syntax.
+#   # They receive `(json.dumps(query_vector), top_k)` params.
+#   review_embedding_search_sql: ""
+#   photo_embedding_search_sql: ""
+#   feature_embedding_search_sql: ""
+
+settings:
+  enabled_geo: true
+  enabled_text: true
+  enabled_image: false
+  enabled_kg: false
+  enable_cross_modal: true
+  top_k: 300
+  evidence_limit: 5
+  support_threshold: 0.7
+  allow_missing_structured_values: false
+  target_answer_count_min: 1
+  target_answer_count_max: 10
+  structured_selection_compact: true
+  structured_selection_seeded: false
+  field_selection_mode: random
+  structured_selection_max_retries: 3
+
+structured_selection:
+  compact: true
+  seeded: false
+  field_selection_mode: random
+  max_retries: 3
+
+# Use this when generating new cases from Yelp/business records.  If `case` or
+# `cases_jsonl` is provided, the pipeline replays those cases instead.
+# case_generation:
+#   count: 10
+#   start_seed: 12345
+#   subset: Geo_Text
+#   qid_prefix: generated
+
+case:
+  qid: example-1
+  subset: Geo_Text
+  seed_business_ids: []
+  structured_filters:
+    - field: categories
+      operator: "="
+      value: ["Cafe"]
+    - field: outdoor_seating
+      operator: "="
+      value: true
+  geo_constraint:
+    reference_latitude: 39.9526
+    reference_longitude: -75.1652
+    radius_km: 5
+  text_query: friendly service and outdoor seating
+  final_query: Find cafes within 5 km that offer outdoor seating and friendly service.

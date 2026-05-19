@@ -1,0 +1,27 @@
+{
+  "type": "object",
+  "required": [
+    "qid",
+    "business_id",
+    "family",
+    "support_status",
+    "claim_summary",
+    "source_locator_type",
+    "source_locator",
+    "verification_method",
+    "raw_content_released"
+  ],
+  "properties": {
+    "qid": {"type": "string"},
+    "business_id": {"type": "string"},
+    "family": {"type": "string"},
+    "support_status": {"type": "string"},
+    "claim_summary": {"type": "string"},
+    "source_locator_type": {"type": "string"},
+    "source_locator": {"type": "string"},
+    "verification_method": {"type": "string"},
+    "confidence": {"type": ["number", "null"]},
+    "raw_content_released": {"type": "boolean"},
+    "details": {"type": "object"}
+  }
+}
