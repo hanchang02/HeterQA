@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>HeterQA: Benchmarking Record Retrieval over Multiple Heterogeneous Sources</title>
+    <meta
+      name="description"
+      content="HeterQA is a benchmark for record retrieval over relational tables, review text, photos, spatial constraints, and graph-derived evidence."
+    >
+    <link rel="icon" href="./static/images/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./static/css/index.css?v=20260529d">
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="page-header" id="top">
+      <div class="container header-layout">
+        <a class="site-mark" href="#top" aria-label="HeterQA home">
+          <img src="./static/images/favicon.svg" alt="">
+          <span>HeterQA</span>
+        </a>
+        <div class="header-main">
+          <h1>HeterQA: Benchmarking Record Retrieval over Multiple Heterogeneous Sources</h1>
+          <p class="authors">Yaodong Su, Hanchang Li, Quanqing Xu, Chuanhui Yang, Yixiang Fang</p>
+          <p class="affiliations">The Chinese University of Hong Kong, Shenzhen | OceanBase, Ant Group</p>
+          <nav class="project-links" aria-label="Project links">
+            <span class="disabled">Paper</span>
+            <a href="https://github.com/hanchang02/HeterQA" target="_blank" rel="noreferrer">Code</a>
+            <a href="https://huggingface.co/datasets/hanchang02/HeterQA" target="_blank" rel="noreferrer">Data</a>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <main class="main" id="main">
+      <article class="container article">
+        <section class="section" id="introduction" aria-labelledby="intro-title">
+          <h2 id="intro-title">Introduction</h2>
+          <p class="lead">
+            HeterQA studies record-level retrieval for natural-language questions whose evidence is
+            distributed across heterogeneous sources.
+          </p>
+          <p>
+            In many practical systems, target records are not described by a single table or document.
+            A business record, for example, may require evidence from relational fields, review text,
+            photos, spatial constraints, and graph-derived signals. A returned record is correct only
+            when its full evidence bundle satisfies the question.
+          </p>
+          <p>
+            HeterQA instantiates this setting with Yelp business records. It asks retrieval methods to
+            identify target records rather than isolated evidence snippets, making the benchmark useful
+            for evaluating candidate acquisition, cross-source grounding, and final record-set selection.
+          </p>
+        </section>
+
+        <section class="section" id="overview" aria-labelledby="overview-title">
+          <h2 id="overview-title">Benchmark Overview</h2>
+          <p>
+            Each HeterQA question combines record-field constraints with one or two additional evidence
+            families: review text, photos, spatial constraints, or graph-derived evidence.
+          </p>
+
+          <div class="table-wrap" aria-label="Key benchmark statistics">
+            <table class="data-table compact-table">
+              <caption>Key HeterQA benchmark statistics.</caption>
+              <tbody>
+                <tr><th scope="row">QA pairs</th><td>857</td></tr>
+                <tr><th scope="row">Evidence sources</th><td>5: record fields, text, images, spatial constraints, and knowledge graphs</td></tr>
+                <tr><th scope="row">Source-composition subsets</th><td>10</td></tr>
+                <tr><th scope="row">Average query length</th><td>22.2 words</td></tr>
+                <tr><th scope="row">Average verified answer set size</th><td>2.3 records</td></tr>
+                <tr><th scope="row">Query diversity</th><td>Shannon Entropy 6.712, Type-Token Ratio 0.204</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="table-wrap" aria-label="Benchmark coverage comparison">
+            <table class="data-table">
+              <caption>Benchmark coverage comparison across related retrieval benchmarks.</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Benchmark</th>
+                  <th scope="col">Open record retrieval</th>
+                  <th scope="col">Relational tables</th>
+                  <th scope="col">Text documents</th>
+                  <th scope="col">Image repositories</th>
+                  <th scope="col">Spatial databases</th>
+                  <th scope="col">Knowledge graphs</th>
+                  <th scope="col">Missing field cues</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><th scope="row">HybridQA</th><td>No</td><td>Partial</td><td>Yes</td><td>No</td><td>No</td><td>Partial</td><td>No</td></tr>
+                <tr><th scope="row">OTT-QA</th><td>Yes</td><td>Partial</td><td>Yes</td><td>No</td><td>No</td><td>Partial</td><td>No</td></tr>
+                <tr><th scope="row">MMQA</th><td>Partial</td><td>Partial</td><td>Yes</td><td>Yes</td><td>No</td><td>Partial</td><td>No</td></tr>
+                <tr><th scope="row">Spider2.0</th><td>No</td><td>Yes</td><td>Partial</td><td>No</td><td>No</td><td>Partial</td><td>No</td></tr>
+                <tr><th scope="row">BIRD</th><td>No</td><td>Yes</td><td>Partial</td><td>No</td><td>No</td><td>Partial</td><td>No</td></tr>
+                <tr><th scope="row">STARK</th><td>Yes</td><td>Partial</td><td>Yes</td><td>No</td><td>No</td><td>Yes</td><td>No</td></tr>
+                <tr class="emphasis-row"><th scope="row">HeterQA</th><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="table-note">
+            Partial denotes a related component that is present but not evaluated as the full
+            capability for certified target-record retrieval.
+          </p>
+        </section>
+
+        <section class="section" id="construction" aria-labelledby="construction-title">
+          <h2 id="construction-title">Construction Workflow</h2>
+          <p>
+            HeterQA uses an answer-driven construction protocol. It starts from executable
+            record-field constraints, expands candidates through heterogeneous evidence sources,
+            verifies source-specific constraints, and only then verbalizes retained cases into
+            natural-language questions.
+          </p>
+          <ol class="plain-list">
+            <li><strong>Relational initialization and missing-value recovery.</strong> Seed records are selected through structured constraints and expanded through text, image, and graph evidence.</li>
+            <li><strong>Source-specific constraint instantiation.</strong> Review text, photos, spatial operators, and graph patterns provide additional constraints.</li>
+            <li><strong>Candidate filtering.</strong> Candidate records are checked against the selected evidence requirements across applicable sources.</li>
+            <li><strong>Question verbalization and contradiction detection.</strong> The generated question is checked against record bundles to remove contradictory cases.</li>
+            <li><strong>Quality certification.</strong> Manual review and answer-set certification finalize the released record labels.</li>
+          </ol>
+
+          <figure>
+            <img src="./static/images/main_process.png" alt="Answer-driven HeterQA construction workflow">
+            <figcaption>Answer-driven construction workflow used to build and verify HeterQA questions.</figcaption>
+          </figure>
+        </section>
+
+        <section class="section" id="dataset" aria-labelledby="dataset-title">
+          <h2 id="dataset-title">Dataset Description</h2>
+          <p>
+            HeterQA covers ten source-composition subsets. The notation below uses <strong>S</strong>
+            for record fields, <strong>T</strong> for review text, <strong>I</strong> for images,
+            <strong>P</strong> for spatial constraints, and <strong>G</strong> for graph-derived evidence.
+          </p>
+
+          <div class="table-wrap" aria-label="Dataset subset statistics">
+            <table class="data-table">
+              <caption>Subset composition and release statistics.</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Subset</th>
+                  <th scope="col">Sources beyond record fields</th>
+                  <th scope="col">Questions</th>
+                  <th scope="col">Avg. length</th>
+                  <th scope="col">Avg. verified answers</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><th scope="row">Q(S+T)</th><td>review text</td><td>96</td><td>21.3</td><td>2.8</td></tr>
+                <tr><th scope="row">Q(S+I)</th><td>photos</td><td>66</td><td>12.8</td><td>2.7</td></tr>
+                <tr><th scope="row">Q(S+P)</th><td>spatial constraints</td><td>138</td><td>16.9</td><td>2.4</td></tr>
+                <tr><th scope="row">Q(S+G)</th><td>graph-derived evidence</td><td>46</td><td>20.7</td><td>3.1</td></tr>
+                <tr><th scope="row">Q(S+T,I)</th><td>review text + photos</td><td>74</td><td>22.9</td><td>2.6</td></tr>
+                <tr><th scope="row">Q(S+T,P)</th><td>review text + spatial constraints</td><td>107</td><td>28.5</td><td>1.5</td></tr>
+                <tr><th scope="row">Q(S+T,G)</th><td>review text + graph-derived evidence</td><td>72</td><td>32.3</td><td>2.9</td></tr>
+                <tr><th scope="row">Q(S+I,P)</th><td>photos + spatial constraints</td><td>133</td><td>18.5</td><td>2.2</td></tr>
+                <tr><th scope="row">Q(S+I,G)</th><td>photos + graph-derived evidence</td><td>44</td><td>24.1</td><td>1.4</td></tr>
+                <tr><th scope="row">Q(S+P,G)</th><td>spatial constraints + graph-derived evidence</td><td>81</td><td>27.4</td><td>1.5</td></tr>
+              </tbody>
+              <tfoot>
+                <tr><th scope="row">Overall</th><td>ten subsets</td><td>857</td><td>22.2</td><td>2.3</td></tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <h3>Representative Questions</h3>
+          <p>
+            Questions ask for target records that jointly satisfy field constraints and non-field
+            evidence. Matching a single review, photo, or nearby location is insufficient when the
+            full record bundle violates another required condition.
+          </p>
+          <figure>
+            <img src="./static/images/intro_examples.png" alt="Representative HeterQA questions">
+            <figcaption>Representative HeterQA questions and source mixtures.</figcaption>
+          </figure>
+        </section>
+
+        <section class="section" id="evaluation" aria-labelledby="evaluation-title">
+          <h2 id="evaluation-title">Evaluation Results</h2>
+          <p>
+            The evaluation compares sparse retrieval, dense retrieval, hybrid retrieval, late-interaction
+            retrieval, and agentic retrieval under the same record-level evaluation metrics.
+          </p>
+          <div class="table-wrap" aria-label="Evaluation summary">
+            <table class="data-table compact-table">
+              <caption>Evaluation summary.</caption>
+              <tbody>
+                <tr><th scope="row">Best Recall@10</th><td>32.78, achieved by hybrid retrieval with Llama embedding and reranking</td></tr>
+                <tr><th scope="row">Best MRR@10</th><td>25.26, achieved by Self-RAG with reranking</td></tr>
+                <tr><th scope="row">BM25 Recall@10</th><td>27.21, showing that sparse retrieval remains a strong acquisition baseline</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <figure>
+            <img src="./static/images/subset_atlas.png" alt="HeterQA source-combination recall heatmaps">
+            <figcaption>Source-combination analysis separates retrieval and reranking behavior across heterogeneous evidence mixtures.</figcaption>
+          </figure>
+        </section>
+
+        <section class="section" id="release" aria-labelledby="release-title">
+          <h2 id="release-title">Release Format</h2>
+          <p>
+            HeterQA publishes benchmark annotations, answer identifiers, qrels, schemas, and
+            structured evidence summaries. It does not redistribute original Yelp reviews, photos,
+            full business records, business addresses, user data, prompt traces, or local paths.
+          </p>
+          <p>
+            Users reconstruct retrieval corpora by separately obtaining the Yelp Open Dataset and
+            joining with HeterQA through stable identifiers such as <code>business_id</code> and
+            recoverable <code>review_id</code> values.
+          </p>
+          <div class="table-wrap" aria-label="Release files">
+            <table class="data-table compact-table">
+              <caption>Release files and descriptions.</caption>
+              <tbody>
+                <tr><th scope="row"><code>data/queries.jsonl</code></th><td>questions and subset labels</td></tr>
+                <tr><th scope="row"><code>data/answers.jsonl</code></th><td>certified answer sets</td></tr>
+                <tr><th scope="row"><code>data/qrels/test.tsv</code></th><td>BEIR-style relevance judgments</td></tr>
+                <tr><th scope="row"><code>data/evidence.jsonl</code></th><td>structured answer-level evidence summaries</td></tr>
+                <tr><th scope="row"><code>data/source_manifest.json</code></th><td>release provenance and scope</td></tr>
+                <tr><th scope="row"><code>schemas/*.schema.json</code></th><td>JSON Schemas for release tables</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+      </article>
+    </main>
+
+    <footer class="footer">
+      <div class="container">
+        <p>
+          HeterQA annotations are released separately from the underlying Yelp source data. Code and
+          dataset artifacts follow their respective license scopes.
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>
